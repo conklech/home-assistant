@@ -155,6 +155,10 @@ class Switch(zha.Entity, BinarySensorDevice):
 
         def cluster_command(self, tsn, command_id, args):
             """Handle commands received to this cluster."""
+            self._entity.hass.bus.fire("zha.node_event", {
+              "entity_id": self._entity.entity_id,
+              "command_id": command_id
+            })
             if command_id in (0x0000, 0x0040):
                 self._entity.set_state(False)
             elif command_id in (0x0001, 0x0041, 0x0042):
@@ -180,6 +184,11 @@ class Switch(zha.Entity, BinarySensorDevice):
 
         def cluster_command(self, tsn, command_id, args):
             """Handle commands received to this cluster."""
+            self._entity.hass.bus.fire("zha.node_event", {
+              "entity_id": self._entity.entity_id,
+              "command_id": command_id,
+              "args": args
+            })
             if command_id in (0x0000, 0x0004):  # move_to_level, -with_on_off
                 self._entity.set_level(args[0])
             elif command_id in (0x0001, 0x0005):  # move, -with_on_off
