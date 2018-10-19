@@ -12,15 +12,15 @@ async def test_validate(hass):
         'data': [{'user_id': 'test-user', 'pin': '123456'}]
     })
 
-    result = await auth_module.async_validation(
+    result = await auth_module.async_validate(
             'test-user', {'pin': '123456'})
     assert result is True
 
-    result = await auth_module.async_validation(
+    result = await auth_module.async_validate(
             'test-user', {'pin': 'invalid'})
     assert result is False
 
-    result = await auth_module.async_validation(
+    result = await auth_module.async_validate(
             'invalid-user', {'pin': '123456'})
     assert result is False
 
@@ -36,7 +36,7 @@ async def test_setup_user(hass):
         'test-user', {'pin': '123456'})
     assert len(auth_module._data) == 1
 
-    result = await auth_module.async_validation(
+    result = await auth_module.async_validate(
             'test-user', {'pin': '123456'})
     assert result is True
 
@@ -119,7 +119,7 @@ async def test_login(hass):
     result = await hass.auth.login_flow.async_configure(
         result['flow_id'], {'pin': 'invalid-code'})
     assert result['type'] == data_entry_flow.RESULT_TYPE_FORM
-    assert result['errors']['base'] == 'invalid_auth'
+    assert result['errors']['base'] == 'invalid_code'
 
     result = await hass.auth.login_flow.async_configure(
         result['flow_id'], {'pin': '123456'})

@@ -17,7 +17,7 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 from homeassistant.util.temperature import celsius_to_fahrenheit
 
-REQUIREMENTS = ['Adafruit-DHT==1.3.3']
+REQUIREMENTS = ['Adafruit-DHT==1.3.4']
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -53,8 +53,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the DHT sensor."""
-    # pylint: disable=import-error
-    import Adafruit_DHT
+    import Adafruit_DHT  # pylint: disable=import-error
 
     SENSOR_TYPES[SENSOR_TEMPERATURE][1] = hass.config.units.temperature_unit
     available_sensors = {

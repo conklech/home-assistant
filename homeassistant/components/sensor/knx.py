@@ -42,7 +42,7 @@ def async_add_entities_discovery(hass, discovery_info, async_add_entities):
     entities = []
     for device_name in discovery_info[ATTR_DISCOVER_DEVICES]:
         device = hass.data[DATA_KNX].xknx.devices[device_name]
-        entities.append(KNXSensor(hass, device))
+        entities.append(KNXSensor(device))
     async_add_entities(entities)
 
 
@@ -56,17 +56,15 @@ def async_add_entities_config(hass, config, async_add_entities):
         group_address=config.get(CONF_ADDRESS),
         value_type=config.get(CONF_TYPE))
     hass.data[DATA_KNX].xknx.devices.add(sensor)
-    async_add_entities([KNXSensor(hass, sensor)])
+    async_add_entities([KNXSensor(sensor)])
 
 
 class KNXSensor(Entity):
     """Representation of a KNX sensor."""
 
-    def __init__(self, hass, device):
+    def __init__(self, device):
         """Initialize of a KNX sensor."""
-        self._device = device
-        self.hass = hass
-        self.async_register_callbacks()
+        self.device = device
 
     @callback
     def async_register_callbacks(self):
@@ -74,12 +72,16 @@ class KNXSensor(Entity):
         async def after_update_callback(device):
             """Call after device was updated."""
             await self.async_update_ha_state()
-        self._device.register_device_updated_cb(after_update_callback)
+        self.device.register_device_updated_cb(after_update_callback)
+
+    async def async_added_to_hass(self):
+        """Store register state change callback."""
+        self.async_register_callbacks()
 
     @property
     def name(self):
         """Return the name of the KNX device."""
-        return self._device.name
+        return self.device.name
 
     @property
     def available(self):
@@ -94,12 +96,12 @@ class KNXSensor(Entity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        return self._device.resolve_state()
+        return self.device.resolve_state()
 
     @property
     def unit_of_measurement(self):
         """Return the unit this state is expressed in."""
-        return self._device.unit_of_measurement()
+        return self.device.unit_of_measurement()
 
     @property
     def device_state_attributes(self):
